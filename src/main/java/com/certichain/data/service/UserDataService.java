@@ -48,4 +48,8 @@ public class UserDataService {
         userDataRepository.deleteById(id);
     }
 
+    public List<UserData> findByUserTypeId(String userTypeId) {
+        return userDataRepository.findAllByUserTypeId(userTypeId);
+    }
+
 }

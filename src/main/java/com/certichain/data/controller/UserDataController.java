@@ -81,4 +81,13 @@ public class UserDataController {
         }
     }
 
+    @GetMapping("/type/{userTypeId}")
+    public ResponseEntity<List<UserData>> getByUserTypeId(@PathVariable String userTypeId) {
+        List<UserData> result = userDataService.findByUserTypeId(userTypeId);
+        if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(result);
+    }
+    
 }

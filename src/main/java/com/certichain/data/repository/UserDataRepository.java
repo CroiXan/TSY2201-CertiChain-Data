@@ -1,5 +1,6 @@
 package com.certichain.data.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -11,5 +12,7 @@ import com.certichain.data.model.UserData;
 public interface UserDataRepository extends MongoRepository<UserData, String> {
 
     Optional<UserData> findByUserID(String userID);
+
+    List<UserData> findAllByUserTypeId(String userTypeId);
     
 }
