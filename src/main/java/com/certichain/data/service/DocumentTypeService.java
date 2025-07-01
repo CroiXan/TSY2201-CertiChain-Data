@@ -3,6 +3,7 @@ package com.certichain.data.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import com.certichain.data.model.DocumentType;
@@ -22,7 +23,8 @@ public class DocumentTypeService {
     }
 
     public Optional<DocumentType> findById(String id) {
-        return documentTypeRepository.findById(id);
+        ObjectId oid = new ObjectId(id);
+        return documentTypeRepository.findById(oid);
     }
 
     public List<DocumentType> findByUserId(String userId) {
@@ -44,10 +46,11 @@ public class DocumentTypeService {
     }
 
     public boolean delete(String id) {  
-        Optional<DocumentType> findedDocumentType = documentTypeRepository.findById(id);
+        ObjectId oid = new ObjectId(id);
+        Optional<DocumentType> findedDocumentType = documentTypeRepository.findById(oid);
 
         if(findedDocumentType.isPresent()){
-            documentTypeRepository.deleteById(id);
+            documentTypeRepository.deleteById(oid);
             return true;
         }else{
             return false;

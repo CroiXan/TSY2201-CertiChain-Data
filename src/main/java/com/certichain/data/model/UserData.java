@@ -1,14 +1,19 @@
 package com.certichain.data.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 @Document(collection = "userdata")
 public class UserData {
 
     @Id
-    private String Id;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private ObjectId Id;
 
     @Indexed(unique = true)  
     private String UserID;
@@ -20,14 +25,6 @@ public class UserData {
     private String UserSubTypeId;
     
     private String Status;
-
-    public String getId() {
-        return Id;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
 
     public String getUserID() {
         return UserID;
@@ -67,5 +64,13 @@ public class UserData {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ObjectId getId() {
+        return Id;
+    }
+
+    public void setId(ObjectId id) {
+        Id = id;
     }
 }

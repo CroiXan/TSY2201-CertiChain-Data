@@ -3,6 +3,7 @@ package com.certichain.data.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,7 +49,8 @@ public class UserSubTypeController {
     @PutMapping("/{id}")
     public ResponseEntity<UserSubType> update(@PathVariable String id,
                                               @RequestBody UserSubType userSubType) {
-        userSubType.setId(id);
+        ObjectId oid = new ObjectId(id);
+        userSubType.setId(oid);
         Optional<UserSubType> updated = userSubTypeService.updateUserSubType(userSubType);
         return updated.map(ResponseEntity::ok)
                       .orElse(ResponseEntity.notFound().build());

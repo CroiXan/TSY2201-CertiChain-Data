@@ -1,23 +1,22 @@
 package com.certichain.data.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 @Document(collection = "documenttype")
 public class DocumentType {
 
     @Id
-    private String Id;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private ObjectId Id;
     private String UserID;
     private String Name;
     private String State;
-    
-    public String getId() {
-        return Id;
-    }
-    public void setId(String id) {
-        Id = id;
-    }
+
     public String getUserID() {
         return UserID;
     }
@@ -35,6 +34,14 @@ public class DocumentType {
     }
     public void setState(String state) {
         State = state;
+    }
+
+    public ObjectId getId() {
+        return Id;
+    }
+
+    public void setId(ObjectId Id) {
+        this.Id = Id;
     }
     
 }

@@ -3,6 +3,7 @@ package com.certichain.data.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import com.certichain.data.model.UserType;
@@ -26,7 +27,8 @@ public class UserTypeService {
     }
 
     public Optional<UserType> getUserSubTypeById(String Id){
-        return userTypeRepository.findById(Id);
+        ObjectId oid = new ObjectId(Id);
+        return userTypeRepository.findById(oid);
     }
 
     public Optional<UserType> updateUserSubType(UserType userType){
@@ -42,12 +44,13 @@ public class UserTypeService {
     }
 
     public boolean deleteUserSubTypeById(String Id){
-        userTypeRepository.deleteById(Id);
+        ObjectId oid = new ObjectId(Id);
+        userTypeRepository.deleteById(oid);
 
-        Optional<UserType> findedUserType = userTypeRepository.findById(Id);
+        Optional<UserType> findedUserType = userTypeRepository.findById(oid);
 
         if(findedUserType.isPresent()){
-            userTypeRepository.deleteById(Id);
+            userTypeRepository.deleteById(oid);
             return true;
         }else{
             return false;

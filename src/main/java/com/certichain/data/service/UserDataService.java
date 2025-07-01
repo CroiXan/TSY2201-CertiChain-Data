@@ -3,6 +3,7 @@ package com.certichain.data.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import com.certichain.data.model.UserData;
@@ -22,7 +23,8 @@ public class UserDataService {
     }
 
     public Optional<UserData> findById(String id) {
-        return userDataRepository.findById(id);
+        ObjectId oid = new ObjectId(id);
+        return userDataRepository.findById(oid);
     }
 
     public Optional<UserData> findByUserID(String userID) {
@@ -34,8 +36,8 @@ public class UserDataService {
     }
 
     public Optional<UserData> update(String id, UserData newData) {
-
-        Optional<UserData> findedUserData = userDataRepository.findById(id);
+        ObjectId oid = new ObjectId(id);
+        Optional<UserData> findedUserData = userDataRepository.findById(oid);
 
         if(findedUserData.isPresent()){
             return Optional.of(userDataRepository.save(newData));
@@ -45,7 +47,8 @@ public class UserDataService {
     }
 
     public void deleteById(String id) {
-        userDataRepository.deleteById(id);
+        ObjectId oid = new ObjectId(id);
+        userDataRepository.deleteById(oid);
     }
 
     public List<UserData> findByUserTypeId(String userTypeId) {
