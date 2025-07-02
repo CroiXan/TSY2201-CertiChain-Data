@@ -2,6 +2,7 @@ package com.certichain.data.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.certichain.data.model.DocumentType;
+import com.certichain.data.model.DocumentTypeApi;
 import com.certichain.data.service.DocumentTypeService;
 
 @RestController
@@ -28,36 +30,40 @@ public class DocumentTypeController {
     }
 
     @GetMapping
-    public List<DocumentType> getAll() {
-        return documentTypeservice.findAll();
+    public List<DocumentTypeApi> getAll() {
+        List<DocumentType> docuTypeList = documentTypeservice.findAll();
+        return docuTypeList.stream()
+                .map(DocumentTypeApi::fromDocumentType)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DocumentType> getById(@PathVariable String id) {
-        return documentTypeservice.findById(id)
-                      .map(ResponseEntity::ok)
-                      .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DocumentTypeApi> getById(@PathVariable String id) {
+        return new ResponseEntity<>(DocumentTypeApi.fromDocumentType(documentTypeservice.findById(id).get()), HttpStatus.OK);
     }
 
     @GetMapping("/user/{userId}")
-    public List<DocumentType> getByUserId(@PathVariable String userId) {
-        return documentTypeservice.findByUserId(userId);
+    public List<DocumentTypeApi> getByUserId(@PathVariable String userId) {
+        List<DocumentType> docuTypeList = documentTypeservice.findByUserId(userId);
+        return docuTypeList.stream()
+                .map(DocumentTypeApi::fromDocumentType)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
-    public ResponseEntity<DocumentType> create(@RequestBody DocumentType documentType) {
-        DocumentType created = documentTypeservice.create(documentType);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<DocumentTypeApi> create(@RequestBody DocumentTypeApi documentType) {
+        DocumentType created = documentTypeservice.create(DocumentTypeApi.toDocumentType(documentType));
+        return new ResponseEntity<>(DocumentTypeApi.fromDocumentType(created), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DocumentType> update(@PathVariable String id,
-                                               @RequestBody DocumentType documentType) {
+    public ResponseEntity<DocumentTypeApi> update(@PathVariable String id,
+            @RequestBody DocumentTypeApi documentType) {
         if (!documentTypeservice.findById(id).isPresent()) {
             return ResponseEntity.notFound().build();
         }
-        Optional<DocumentType> updated = documentTypeservice.update(documentType);
-        return ResponseEntity.ok(updated.get());
+        Optional<DocumentType> updated = documentTypeservice.update(DocumentTypeApi.toDocumentType(documentType));
+        return ResponseEntity.ok(DocumentTypeApi.fromDocumentType(updated.get()));
     }
 
     @DeleteMapping("/{id}")
@@ -68,5 +74,5 @@ public class DocumentTypeController {
         documentTypeservice.delete(id);
         return ResponseEntity.noContent().build();
     }
-    
+
 }

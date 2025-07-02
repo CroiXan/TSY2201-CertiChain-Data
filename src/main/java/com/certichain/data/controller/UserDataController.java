@@ -2,6 +2,7 @@ package com.certichain.data.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.certichain.data.model.UserData;
+import com.certichain.data.model.UserDataApi;
 import com.certichain.data.service.UserDataService;
 
 @RestController
@@ -28,44 +30,46 @@ public class UserDataController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserData>> getAll() {
-        return ResponseEntity.ok(userDataService.findAll());
+    public ResponseEntity<List<UserDataApi>> getAll() {
+        return ResponseEntity.ok( userDataService.findAll().stream()
+                .map(UserDataApi::fromUserData)
+                .collect(Collectors.toList()) );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserData> getById(@PathVariable String id) {
+    public ResponseEntity<UserDataApi> getById(@PathVariable String id) {
         Optional<UserData> userOpt = userDataService.findById(id);
         if (userOpt.isPresent()) {
-            return ResponseEntity.ok(userOpt.get());
+            return ResponseEntity.ok( UserDataApi.fromUserData(userOpt.get()) );
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/userid/{userID}")
-    public ResponseEntity<UserData> getByUserID(@PathVariable String userID) {
+    public ResponseEntity<UserDataApi> getByUserID(@PathVariable String userID) {
         Optional<UserData> userOpt = userDataService.findByUserID(userID);
         if (userOpt.isPresent()) {
-            return ResponseEntity.ok(userOpt.get());
+            return ResponseEntity.ok( UserDataApi.fromUserData(userOpt.get()) );
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping
-    public ResponseEntity<UserData> create(@RequestBody UserData userData) {
-        UserData created = userDataService.create(userData);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<UserDataApi> create(@RequestBody UserDataApi userData) {
+        UserData created = userDataService.create(UserDataApi.toUserData(userData));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserDataApi.fromUserData(created));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserData> update(
+    public ResponseEntity<UserDataApi> update(
             @PathVariable String id,
-            @RequestBody UserData userData) {
-        Optional<UserData> updatedOpt = userDataService.update(id, userData);
+            @RequestBody UserDataApi userData) {
+        Optional<UserData> updatedOpt = userDataService.update(id, UserDataApi.toUserData(userData));
 
         if (updatedOpt.isPresent()) {
-            return ResponseEntity.ok(updatedOpt.get());
+            return ResponseEntity.ok(UserDataApi.fromUserData(updatedOpt.get()));
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -82,12 +86,14 @@ public class UserDataController {
     }
 
     @GetMapping("/type/{userTypeId}")
-    public ResponseEntity<List<UserData>> getByUserTypeId(@PathVariable String userTypeId) {
+    public ResponseEntity<List<UserDataApi>> getByUserTypeId(@PathVariable String userTypeId) {
         List<UserData> result = userDataService.findByUserTypeId(userTypeId);
         if (result.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(result.stream()
+                .map(UserDataApi::fromUserData)
+                .collect(Collectors.toList()));
     }
     
 }

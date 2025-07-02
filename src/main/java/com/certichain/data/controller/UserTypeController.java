@@ -2,8 +2,8 @@ package com.certichain.data.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.certichain.data.model.UserType;
+import com.certichain.data.model.UserTypeApi;
 import com.certichain.data.service.UserTypeService;
 
 @RestController
@@ -29,31 +30,32 @@ public class UserTypeController {
     }
 
     @GetMapping
-    public List<UserType> getAll() {
-        return userTypeService.getAll();
+    public List<UserTypeApi> getAll() {
+        return userTypeService.getAll().stream()
+                .map(UserTypeApi::fromUserType)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserType> getById(@PathVariable String id) {
+    public ResponseEntity<UserTypeApi> getById(@PathVariable String id) {
         Optional<UserType> ut = userTypeService.getUserSubTypeById(id);
-        return ut.map(ResponseEntity::ok)
-                 .orElse(ResponseEntity.notFound().build());
+        UserTypeApi utapi = UserTypeApi.fromUserType(ut.get());
+        return new ResponseEntity<>(utapi, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<UserType> create(@RequestBody UserType userType) {
-        var created = userTypeService.createUserType(userType);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<UserTypeApi> create(@RequestBody UserTypeApi userType) {
+        UserType created = userTypeService.createUserType(UserTypeApi.toUserType(userType));
+        return new ResponseEntity<>(UserTypeApi.fromUserType(created), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserType> update(@PathVariable String id,
-                                           @RequestBody UserType userType) {
-        ObjectId oid = new ObjectId(id);
-        userType.setId(oid);
-        Optional<UserType> updated = userTypeService.updateUserSubType(userType);
-        return updated.map(ResponseEntity::ok)
-                      .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<UserTypeApi> update(@PathVariable String id,
+                                           @RequestBody UserTypeApi userType) {
+        userType.setId(id);
+        Optional<UserType> updated = userTypeService.updateUserSubType(UserTypeApi.toUserType(userType));
+        UserTypeApi utapi = UserTypeApi.fromUserType(updated.get());
+        return new ResponseEntity<>(utapi, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
