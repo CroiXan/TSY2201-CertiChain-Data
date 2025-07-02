@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,29 +33,29 @@ public class UserTypeController {
     @GetMapping
     public List<UserTypeApi> getAll() {
         return userTypeService.getAll().stream()
-                .map(UserTypeApi::fromUserType)
+                .map(this::fromUserType)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserTypeApi> getById(@PathVariable String id) {
         Optional<UserType> ut = userTypeService.getUserSubTypeById(id);
-        UserTypeApi utapi = UserTypeApi.fromUserType(ut.get());
+        UserTypeApi utapi = this.fromUserType(ut.get());
         return new ResponseEntity<>(utapi, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<UserTypeApi> create(@RequestBody UserTypeApi userType) {
-        UserType created = userTypeService.createUserType(UserTypeApi.toUserType(userType));
-        return new ResponseEntity<>(UserTypeApi.fromUserType(created), HttpStatus.CREATED);
+        UserType created = userTypeService.createUserType(this.toUserType(userType));
+        return new ResponseEntity<>(this.fromUserType(created), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserTypeApi> update(@PathVariable String id,
                                            @RequestBody UserTypeApi userType) {
         userType.setId(id);
-        Optional<UserType> updated = userTypeService.updateUserSubType(UserTypeApi.toUserType(userType));
-        UserTypeApi utapi = UserTypeApi.fromUserType(updated.get());
+        Optional<UserType> updated = userTypeService.updateUserSubType(this.toUserType(userType));
+        UserTypeApi utapi = this.fromUserType(updated.get());
         return new ResponseEntity<>(utapi, HttpStatus.OK);
     }
 
@@ -67,4 +68,31 @@ public class UserTypeController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    private UserType toUserType(UserTypeApi api) {
+        UserType userType = new UserType();
+
+        if (api.getId() != null && ObjectId.isValid(api.getId())) {
+            userType.setId(new ObjectId(api.getId()));
+        }
+
+        userType.setName(api.getName());
+        userType.setState(api.getState());
+
+        return userType;
+    }
+
+    private UserTypeApi fromUserType(UserType userType) {
+        UserTypeApi api = new UserTypeApi();
+
+        if (userType.getId() != null) {
+            api.setId(userType.getId().toString());
+        }
+
+        api.setName(userType.getName());
+        api.setState(userType.getState());
+
+        return api;
+    }
+    
 }

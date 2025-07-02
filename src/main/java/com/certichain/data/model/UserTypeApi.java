@@ -1,7 +1,5 @@
 package com.certichain.data.model;
 
-import org.bson.types.ObjectId;
-
 public class UserTypeApi {
     
     private String id;
@@ -27,29 +25,4 @@ public class UserTypeApi {
         State = state;
     }
 
-    public static UserType toUserType(UserTypeApi api) {
-        UserType userType = new UserType();
-
-        if (api.getId() != null && ObjectId.isValid(api.getId())) {
-            userType.setId(new ObjectId(api.getId()));
-        }
-
-        userType.setName(api.getName());
-        userType.setState(api.getState());
-
-        return userType;
-    }
-
-    public static UserTypeApi fromUserType(UserType userType) {
-        UserTypeApi api = new UserTypeApi();
-
-        if (userType.getId() != null) {
-            api.setId(userType.getId().toString());
-        }
-
-        api.setName(userType.getName());
-        api.setState(userType.getState());
-
-        return api;
-    }
 }

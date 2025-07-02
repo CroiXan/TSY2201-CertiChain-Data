@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +33,7 @@ public class UserDataController {
     @GetMapping
     public ResponseEntity<List<UserDataApi>> getAll() {
         return ResponseEntity.ok( userDataService.findAll().stream()
-                .map(UserDataApi::fromUserData)
+                .map(this::fromUserData)
                 .collect(Collectors.toList()) );
     }
 
@@ -40,7 +41,7 @@ public class UserDataController {
     public ResponseEntity<UserDataApi> getById(@PathVariable String id) {
         Optional<UserData> userOpt = userDataService.findById(id);
         if (userOpt.isPresent()) {
-            return ResponseEntity.ok( UserDataApi.fromUserData(userOpt.get()) );
+            return ResponseEntity.ok( this.fromUserData(userOpt.get()) );
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -50,7 +51,7 @@ public class UserDataController {
     public ResponseEntity<UserDataApi> getByUserID(@PathVariable String userID) {
         Optional<UserData> userOpt = userDataService.findByUserID(userID);
         if (userOpt.isPresent()) {
-            return ResponseEntity.ok( UserDataApi.fromUserData(userOpt.get()) );
+            return ResponseEntity.ok( this.fromUserData(userOpt.get()) );
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -58,18 +59,19 @@ public class UserDataController {
 
     @PostMapping
     public ResponseEntity<UserDataApi> create(@RequestBody UserDataApi userData) {
-        UserData created = userDataService.create(UserDataApi.toUserData(userData));
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserDataApi.fromUserData(created));
+        UserData created = userDataService.create(this.toUserData(userData));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.fromUserData(created));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDataApi> update(
             @PathVariable String id,
             @RequestBody UserDataApi userData) {
-        Optional<UserData> updatedOpt = userDataService.update(id, UserDataApi.toUserData(userData));
+        UserData ud = this.toUserData(userData);
+        Optional<UserData> updatedOpt = userDataService.update(id, ud);
 
         if (updatedOpt.isPresent()) {
-            return ResponseEntity.ok(UserDataApi.fromUserData(updatedOpt.get()));
+            return ResponseEntity.ok(this.fromUserData(updatedOpt.get()));
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -92,8 +94,39 @@ public class UserDataController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(result.stream()
-                .map(UserDataApi::fromUserData)
+                .map(this::fromUserData)
                 .collect(Collectors.toList()));
     }
     
+    private UserData toUserData(UserDataApi api) {
+        UserData userData = new UserData();
+
+        if (api.getId() != null && ObjectId.isValid(api.getId())) {
+            userData.setId(new ObjectId(api.getId()));
+        }
+
+        userData.setUserID(api.getUserID());
+        userData.setName(api.getName());
+        userData.setUserTypeId(api.getUserTypeId());
+        userData.setUserSubTypeId(api.getUserSubTypeId());
+        userData.setStatus(api.getStatus());
+
+        return userData;
+    }
+
+    private UserDataApi fromUserData(UserData userData) {
+        UserDataApi api = new UserDataApi();
+
+        if (userData.getId() != null) {
+            api.setId(userData.getId().toString());
+        }
+
+        api.setUserID(userData.getUserID());
+        api.setName(userData.getName());
+        api.setUserTypeId(userData.getUserTypeId());
+        api.setUserSubTypeId(userData.getUserSubTypeId());
+        api.setStatus(userData.getStatus());
+
+        return api;
+    }
 }

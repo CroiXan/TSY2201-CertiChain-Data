@@ -57,20 +57,4 @@ public class UserDataApi {
         Status = status;
     }
 
-    public static UserDataApi fromUserData(UserData userData) {
-        UserDataApi api = new UserDataApi();
-
-        if (userData.getId() != null) {
-            api.setId(userData.getId().toString());
-        }
-
-        api.setUserID(userData.getUserID());
-        api.setName(userData.getName());
-        api.setUserTypeId(userData.getUserTypeId());
-        api.setUserSubTypeId(userData.getUserSubTypeId());
-        api.setStatus(userData.getStatus());
-
-        return api;
-    }
-    
 }
