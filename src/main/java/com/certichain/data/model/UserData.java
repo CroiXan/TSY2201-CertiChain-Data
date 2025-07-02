@@ -13,7 +13,7 @@ public class UserData {
 
     @Id
     @JsonSerialize(using = ToStringSerializer.class)
-    private ObjectId Id;
+    private ObjectId id;
 
     @Indexed(unique = true)  
     private String UserID;
@@ -67,10 +67,10 @@ public class UserData {
     }
 
     public ObjectId getId() {
-        return Id;
+        return this.id;
     }
 
     public void setId(ObjectId id) {
-        Id = id;
+        this.id = id;
     }
 }

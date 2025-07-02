@@ -12,7 +12,7 @@ public class DocumentType {
 
     @Id
     @JsonSerialize(using = ToStringSerializer.class)
-    private ObjectId Id;
+    private ObjectId id;
     private String UserID;
     private String Name;
     private String State;
@@ -37,11 +37,11 @@ public class DocumentType {
     }
 
     public ObjectId getId() {
-        return Id;
+        return this.id;
     }
 
     public void setId(ObjectId Id) {
-        this.Id = Id;
+        this.id = Id;
     }
     
 }
