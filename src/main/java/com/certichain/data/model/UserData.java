@@ -17,6 +17,7 @@ public class UserData {
     private ObjectId id;
 
     @Indexed(unique = true)  
+    @Field("UserID")
     private String UserID;
 
     private String name;
