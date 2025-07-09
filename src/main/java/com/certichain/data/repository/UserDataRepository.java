@@ -13,6 +13,7 @@ import com.certichain.data.model.UserData;
 @Repository
 public interface UserDataRepository extends MongoRepository<UserData, ObjectId> {
 
+    @Query("{ 'UserID' : ?0 }")
     Optional<UserData> findByUserID(String userID);
 
     @Query("{ 'UserTypeId' : ?0 }")
